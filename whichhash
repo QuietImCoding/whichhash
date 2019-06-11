@@ -25,8 +25,9 @@ _find_hash() {
 }
 
 
-if [[ ${#@} -eq 0 ]]; then
-    cat <<EOF
+whichhash() {
+    if [[ ${#@} -eq 0 ]]; then
+	cat <<EOF
 #     #                        #     #                      
 #  #  # #    # #  ####  #    # #     #   ##    ####  #    # 
 #  #  # #    # # #    # #    # #     #  #  #  #      #    # 
@@ -38,16 +39,23 @@ if [[ ${#@} -eq 0 ]]; then
 Tries to find hashes that match different permutations of information you find.
 Type 'done' when you've entered all of your information.
 EOF
-    read -p "Target hash: " args
-    while [[ $uin != 'done' ]]; do
-	read -p "Piece of information: " uin
-	if [[ $uin != 'done' ]]; then
-	    args="$args $uin"
-	fi
-    done
-    _find_hash $args
-else
-    _find_hash $@
-fi
+	read -p "Target hash: " args
+	while [[ $uin != 'done' ]]; do
+	    read -p "Piece of information: " uin
+	    if [[ $uin != 'done' ]]; then
+		args="$args $uin"
+	    fi
+	done
+	_find_hash $args
+    else
+	_find_hash $@
+    fi
+}
 
-
+# If script is sourced, just load functions
+# Otherwise run interactively
+([[ -n $ZSH_EVAL_CONTEXT && $ZSH_EVAL_CONTEXT =~ :file$ ]] || 
+ [[ -n $KSH_VERSION && $(cd "$(dirname -- "$0")" &&
+    printf '%s' "${PWD%/}/")$(basename -- "$0") != "${.sh.file}" ]] || 
+ [[ -n $BASH_VERSION ]] && (return 0 2>/dev/null)) && sourced=1 || sourced=0
+if [[ $sourced -eq 0 ]]; then whichhash $@; fi
