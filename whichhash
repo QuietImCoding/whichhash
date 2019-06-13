@@ -15,11 +15,14 @@ _find_hash() {
 	sha256hash=$(printf "$p" | shasum -a 256 | cut -d' ' -f1)
 	sha512hash=$(printf "$p" | shasum -a 512 | cut -d' ' -f1)
 	md5hash=$(printf "$p" | md5sum | cut -d' ' -f1)
+	b64encoded=$(printf "$p" | base64)
 	case $target in
 	    $sha1hash) echo "sha1 hash of $p matches!"; return;;
 	    $sha256hash) echo "sha256 hash of $p matches!"; return;;
 	    $sha512hash) echo "sha512 hash of $p matches!"; return;;
 	    $md5hash) echo "md5 hash of $p matches!"; return;;
+	    # I know this isn't a hash but it just makes things easier
+	    $b64encoded) echo "base64 encoding $p matches!"; return;;
 	esac
     done
 }
@@ -40,6 +43,7 @@ Tries to find hashes that match different permutations of information you find.
 Type 'done' when you've entered all of your information.
 EOF
 	read -p "Target hash: " args
+	uin='' # Lol this was getting set to done after the script run
 	while [[ $uin != 'done' ]]; do
 	    read -p "Piece of information: " uin
 	    if [[ $uin != 'done' ]]; then
